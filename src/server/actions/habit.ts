@@ -25,10 +25,36 @@ export async function createHabit(input: unknown): Promise<ActionResult> {
   return { ok: true, data: habit };
 }
 
+export async function updateHabit(id: string, data: { name?: string; emoji?: string; color?: string }): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  const h = await habitService.update(user.id, id, data);
+  revalidatePath("/habits");
+  return { ok: true, data: h };
+}
+
+export async function deleteHabit(id: string): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  await habitService.remove(user.id, id);
+  revalidatePath("/habits");
+  revalidatePath("/");
+  return { ok: true, data: null };
+}
+
 export async function toggleHabitToday(habitId: string): Promise<ActionResult> {
   const user = await getUser();
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   const res = await habitService.toggleToday(user.id, habitId);
+  revalidatePath("/habits");
+  revalidatePath("/");
+  return { ok: true, data: res };
+}
+
+export async function toggleHabitOnDate(habitId: string, dateKey: string): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  const res = await habitService.toggleOnDate(user.id, habitId, new Date(dateKey));
   revalidatePath("/habits");
   revalidatePath("/");
   return { ok: true, data: res };

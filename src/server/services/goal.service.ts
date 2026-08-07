@@ -40,6 +40,38 @@ export const goalService = {
     return prisma.goal.update({ where: { id: m.goalId }, data: { progress } });
   },
 
+  async addMilestone(userId: string, goalId: string, title: string) {
+    await goalService.assertOwner(userId, goalId);
+    const count = await prisma.milestone.count({ where: { goalId } });
+    await prisma.milestone.create({ data: { goalId, title, order: count + 1 } });
+    // Recompute progress after adding.
+    return goalService.recompute(goalId);
+  },
+
+  async deleteMilestone(userId: string, milestoneId: string) {
+    const m = await prisma.milestone.findUnique({ where: { id: milestoneId }, include: { goal: true } });
+    if (!m || m.goal.userId !== userId) throw new Error("Không có quyền.");
+    await prisma.milestone.delete({ where: { id: milestoneId } });
+    return goalService.recompute(m.goalId);
+  },
+
+  async deleteGoal(userId: string, id: string) {
+    await goalService.assertOwner(userId, id);
+    return prisma.goal.delete({ where: { id } });
+  },
+
+  async setProgressManual(userId: string, id: string, progress: number) {
+    await goalService.assertOwner(userId, id);
+    return prisma.goal.update({ where: { id }, data: { progress, status: progress >= 100 ? "done" : "active" } });
+  },
+
+  async recompute(goalId: string) {
+    const all = await prisma.milestone.findMany({ where: { goalId } });
+    const done = all.filter((x) => x.done).length;
+    const progress = all.length ? Math.round((done / all.length) * 100) : 0;
+    return prisma.goal.update({ where: { id: goalId }, data: { progress } });
+  },
+
   async assertOwner(userId: string, id: string) {
     const goal = await prisma.goal.findUnique({ where: { id } });
     if (!goal || goal.userId !== userId) throw new Error("Không tìm thấy hoặc không có quyền.");

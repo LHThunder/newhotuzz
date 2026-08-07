@@ -51,3 +51,37 @@ export async function toggleTaskDone(id: string): Promise<ActionResult> {
   revalidatePath("/");
   return { ok: true, data: task };
 }
+
+export async function deleteTask(id: string): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  await taskService.remove(user.id, id);
+  revalidatePath("/tasks");
+  revalidatePath("/");
+  return { ok: true, data: null };
+}
+
+export async function addSubtask(taskId: string, title: string): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  if (!title.trim()) return { ok: false, error: "Trống." };
+  const st = await taskService.addSubtask(user.id, taskId, title.trim());
+  revalidatePath("/tasks");
+  return { ok: true, data: st };
+}
+
+export async function toggleSubtask(subtaskId: string): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  const st = await taskService.toggleSubtask(user.id, subtaskId);
+  revalidatePath("/tasks");
+  return { ok: true, data: st };
+}
+
+export async function removeSubtask(subtaskId: string): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  await taskService.removeSubtask(user.id, subtaskId);
+  revalidatePath("/tasks");
+  return { ok: true, data: null };
+}

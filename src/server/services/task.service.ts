@@ -30,6 +30,23 @@ export const taskService = {
     });
   },
 
+  async addSubtask(userId: string, taskId: string, title: string) {
+    await taskService.assertOwner(userId, taskId);
+    return prisma.subtask.create({ data: { taskId, title } });
+  },
+
+  async toggleSubtask(userId: string, subtaskId: string) {
+    const st = await prisma.subtask.findUnique({ where: { id: subtaskId }, include: { task: true } });
+    if (!st || st.task.userId !== userId) throw new Error("Không có quyền.");
+    return prisma.subtask.update({ where: { id: subtaskId }, data: { done: !st.done } });
+  },
+
+  async removeSubtask(userId: string, subtaskId: string) {
+    const st = await prisma.subtask.findUnique({ where: { id: subtaskId }, include: { task: true } });
+    if (!st || st.task.userId !== userId) throw new Error("Không có quyền.");
+    return prisma.subtask.delete({ where: { id: subtaskId } });
+  },
+
   create(userId: string, input: CreateTaskInput) {
     const { tagIds, ...rest } = input;
     return prisma.task.create({

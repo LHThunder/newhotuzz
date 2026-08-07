@@ -1,7 +1,10 @@
 import { TrendingUp, PiggyBank, ArrowDownLeft, ArrowUpRight, Wallet, Receipt } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Donut } from "@/components/charts/donut";
+import { CashflowChart } from "@/components/charts/cashflow-chart";
 import { AddTransaction } from "@/components/finance/add-transaction";
+import { BudgetManager } from "@/components/finance/budget-manager";
+import { TxDelete } from "@/components/finance/tx-delete";
 import { EmptyState } from "@/components/ui/empty-state";
 import { formatMoney, cn } from "@/lib/utils";
 import { localeFor, currencySymbol } from "@/lib/settings-config";
@@ -11,17 +14,20 @@ import { financeService } from "@/server/services/finance.service";
 export const metadata = { title: "Finance — LIFE OS" };
 
 const palette = ["#f59e0b", "#8b5cf6", "#38bdf8", "#f472b6", "#22c55e", "#94a3b8", "#fb923c"];
+const emptySummary = { income: 0, expense: 0, netWorth: 0, savingsRate: 0, byCategory: [] as { category: string; amount: number }[] };
 
 export default async function FinancePage() {
   const user = await ensureUser();
 
-  const [summary, txns, accounts] = user
+  const [summary, txns, accounts, series, budgets] = user
     ? await Promise.all([
         financeService.summary(user.id),
         financeService.list(user.id, 30),
         financeService.accounts(user.id),
+        financeService.monthlySeries(user.id, 6),
+        financeService.budgets(user.id),
       ])
-    : [{ income: 0, expense: 0, netWorth: 0, savingsRate: 0, byCategory: [] as { category: string; amount: number }[] }, [], []];
+    : [emptySummary, [], [], [], []];
 
   const currency = user?.settings?.currency ?? "VND";
   const locale = localeFor[user?.settings?.language ?? "vi"] ?? "vi-VN";
@@ -37,7 +43,7 @@ export default async function FinancePage() {
           <h1 className="text-2xl font-semibold tracking-tight">Finance</h1>
           <p className="text-sm text-muted-foreground">Dòng tiền, chi tiêu & tài sản.</p>
         </div>
-        <AddTransaction currency={currencySymbol[currency]} />
+        <AddTransaction currency={currencySymbol[currency]} accounts={accounts.map((a) => ({ id: a.id, name: a.name }))} />
       </div>
 
       {/* Summary hero */}
@@ -63,6 +69,18 @@ export default async function FinancePage() {
           description="Thêm khoản thu/chi đầu tiên bằng nút “+ Giao dịch” ở trên."
         />
       ) : (
+       <>
+        {/* Cashflow + budgets */}
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="lg:col-span-2">
+            <CardHeader className="flex-row items-center justify-between">
+              <CardTitle>Dòng tiền 6 tháng</CardTitle>
+            </CardHeader>
+            <CardContent><CashflowChart data={series} currency={currency} locale={locale} /></CardContent>
+          </Card>
+          <BudgetManager budgets={budgets} money={money} />
+        </div>
+
         <div className="grid gap-4 lg:grid-cols-3">
           {/* Spending donut */}
           {byCategory.length > 0 && (
@@ -116,23 +134,25 @@ export default async function FinancePage() {
               ) : txns.map((t) => {
                 const income = t.type === "INCOME";
                 return (
-                  <div key={t.id} className="flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-accent/30">
+                  <div key={t.id} className="group flex items-center gap-3 rounded-xl px-2 py-2 transition-colors hover:bg-accent/30">
                     <span className={cn("grid size-8 place-items-center rounded-full", income ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400")}>
                       {income ? <ArrowDownLeft className="size-4" /> : <ArrowUpRight className="size-4" />}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm">{t.note || t.category}</p>
-                      <p className="text-[11px] text-muted-foreground">{t.category}</p>
+                      <p className="text-[11px] text-muted-foreground">{new Date(t.date).toLocaleDateString(locale, { day: "numeric", month: "numeric" })} · {t.category}</p>
                     </div>
                     <span className={cn("text-sm font-medium tabular-nums", income ? "text-emerald-400" : "text-foreground")}>
                       {income ? "+" : "−"}{money(Number(t.amount))}
                     </span>
+                    <TxDelete id={t.id} />
                   </div>
                 );
               })}
             </CardContent>
           </Card>
         </div>
+       </>
       )}
     </div>
   );

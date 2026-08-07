@@ -11,19 +11,24 @@ import { quickAddTransaction } from "@/server/actions/finance";
 
 const categories = ["Ăn uống", "Nhà ở", "Di chuyển", "Giải trí", "Học tập", "Thu nhập", "Khác"];
 
-export function AddTransaction({ currency = "₫" }: { currency?: string }) {
+export function AddTransaction({ currency = "₫", accounts = [] }: { currency?: string; accounts?: { id: string; name: string }[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<"EXPENSE" | "INCOME">("EXPENSE");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Ăn uống");
   const [note, setNote] = useState("");
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [accountId, setAccountId] = useState("");
   const [pending, setPending] = useState(false);
 
   const submit = async () => {
     if (!amount) return;
     setPending(true);
-    await quickAddTransaction({ type, amount: Number(amount), category, note: note || undefined });
+    await quickAddTransaction({
+      type, amount: Number(amount), category, note: note || undefined,
+      date, ...(accountId ? { accountId } : {}),
+    });
     setPending(false);
     setOpen(false);
     setAmount("");
@@ -106,6 +111,18 @@ export function AddTransaction({ currency = "₫" }: { currency?: string }) {
                 </div>
 
                 <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ghi chú (tuỳ chọn)" />
+
+                <div className="flex gap-2">
+                  <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
+                    className="h-9 flex-1 rounded-lg border border-border bg-transparent px-2 text-sm outline-none focus:ring-2 focus:ring-ring" />
+                  {accounts.length > 1 && (
+                    <select value={accountId} onChange={(e) => setAccountId(e.target.value)}
+                      className="h-9 flex-1 rounded-lg border border-border bg-transparent px-2 text-sm outline-none focus:ring-2 focus:ring-ring">
+                      <option value="" className="bg-background">Tài khoản mặc định</option>
+                      {accounts.map((a) => <option key={a.id} value={a.id} className="bg-background">{a.name}</option>)}
+                    </select>
+                  )}
+                </div>
 
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="sm" onClick={() => setOpen(false)}>Huỷ</Button>

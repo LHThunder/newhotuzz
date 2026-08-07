@@ -6,6 +6,6 @@ export const metadata = { title: "Habits — LIFE OS" };
 
 export default async function HabitsPage() {
   const user = await ensureUser();
-  const habits = user ? await habitService.listWithToday(user.id) : [];
+  const habits = user ? await habitService.listDetailed(user.id) : [];
   return <HabitsView habits={habits} />;
 }
