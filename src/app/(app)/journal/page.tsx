@@ -4,6 +4,7 @@ import { ensureUser } from "@/server/services/user.service";
 import { Card, CardContent } from "@/components/ui/card";
 import { JournalComposer } from "@/components/journal/composer";
 import { EmptyState } from "@/components/ui/empty-state";
+import { DeleteButton } from "@/components/tracker/delete-button";
 
 export const metadata = { title: "Journal — LIFE OS" };
 
@@ -34,6 +35,7 @@ export default async function JournalPage() {
                 <div className="mb-2 flex items-center gap-2 text-xs text-muted-foreground">
                   {e.mood && <span className="text-base">{moodEmoji[e.mood]}</span>}
                   <span>{new Date(e.createdAt).toLocaleString("vi-VN", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</span>
+                  <DeleteButton type="journal" id={e.id} className="ml-auto" />
                 </div>
                 <p className="whitespace-pre-wrap text-sm leading-relaxed">{e.content}</p>
               </CardContent>

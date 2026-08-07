@@ -5,6 +5,7 @@ import { createProject } from "@/server/actions/tracker";
 import { Card, CardContent } from "@/components/ui/card";
 import { InlineAdd } from "@/components/ui/inline-add";
 import { EmptyState } from "@/components/ui/empty-state";
+import { DeleteButton } from "@/components/tracker/delete-button";
 
 export const metadata = { title: "Projects — LIFE OS" };
 
@@ -41,6 +42,7 @@ export default async function ProjectsPage() {
                   <p className="font-medium">{p.name}</p>
                   <p className="text-xs text-muted-foreground">{p._count.tasks} task · {p.status}</p>
                 </div>
+                <DeleteButton type="project" id={p.id} />
               </CardContent>
             </Card>
           ))}

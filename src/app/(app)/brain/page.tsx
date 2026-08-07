@@ -5,6 +5,7 @@ import { createNoteQuick } from "@/server/actions/note";
 import { Card, CardContent } from "@/components/ui/card";
 import { InlineAdd } from "@/components/ui/inline-add";
 import { EmptyState } from "@/components/ui/empty-state";
+import { DeleteButton } from "@/components/tracker/delete-button";
 
 export const metadata = { title: "Second Brain — LIFE OS" };
 
@@ -34,7 +35,10 @@ export default async function BrainPage() {
           {notes.map((n) => (
             <Card key={n.id}>
               <CardContent className="pt-5">
-                <p className="font-medium leading-snug">{n.title}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium leading-snug">{n.title}</p>
+                  <DeleteButton type="note" id={n.id} className="-mr-1 -mt-1 shrink-0" />
+                </div>
                 {n.content && <p className="mt-1 line-clamp-3 text-sm text-muted-foreground">{n.content}</p>}
                 <p className="mt-2 text-[11px] capitalize text-muted-foreground/70">{n.kind}</p>
               </CardContent>

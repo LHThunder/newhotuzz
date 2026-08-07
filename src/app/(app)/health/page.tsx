@@ -5,6 +5,7 @@ import { settingsService } from "@/server/services/settings.service";
 import { HealthLogger } from "@/components/health/health-logger";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { DeleteButton } from "@/components/tracker/delete-button";
 
 export const metadata = { title: "Health — LIFE OS" };
 
@@ -47,10 +48,11 @@ export default async function HealthPage() {
           ) : (
             <div className="space-y-1">
               {recent.map((m) => (
-                <div key={m.id} className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent/30">
+                <div key={m.id} className="group flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent/30">
                   <span className="flex-1">{kindLabel[m.kind] ?? m.kind}</span>
                   <span className="font-medium tabular-nums">{m.value.toLocaleString("vi-VN")} {kindUnit[m.kind] ?? ""}</span>
                   <span className="text-xs text-muted-foreground">{new Date(m.date).toLocaleDateString("vi-VN", { day: "numeric", month: "numeric" })}</span>
+                  <DeleteButton type="health" id={m.id} className="opacity-0 group-hover:opacity-100" />
                 </div>
               ))}
             </div>

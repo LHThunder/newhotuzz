@@ -2,15 +2,11 @@ import { GraduationCap } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/server/services/user.service";
 import { createCourse } from "@/server/actions/tracker";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
+import { CourseItem } from "@/components/tracker/course-item";
 import { InlineAdd } from "@/components/ui/inline-add";
 import { EmptyState } from "@/components/ui/empty-state";
 
 export const metadata = { title: "Learning — LIFE OS" };
-
-const statusLabel: Record<string, string> = { learning: "Đang học", done: "Hoàn thành", wishlist: "Dự định" };
 
 export default async function LearningPage() {
   const user = await ensureUser();
@@ -32,17 +28,7 @@ export default async function LearningPage() {
       ) : (
         <div className="space-y-3">
           {courses.map((c) => (
-            <Card key={c.id}>
-              <CardContent className="pt-4">
-                <div className="flex items-center justify-between">
-                  <p className="font-medium">{c.title}</p>
-                  <Badge variant="outline" className="text-[10px]">{statusLabel[c.status] ?? c.status}</Badge>
-                </div>
-                {c.provider && <p className="text-xs text-muted-foreground">{c.provider}</p>}
-                <Progress value={c.progress} className="mt-2.5 h-1.5" indicatorClassName="bg-sky-500" />
-                <p className="mt-1 text-right text-[11px] text-muted-foreground">{c.progress}%</p>
-              </CardContent>
-            </Card>
+            <CourseItem key={c.id} course={{ id: c.id, title: c.title, provider: c.provider, progress: c.progress, status: c.status }} />
           ))}
         </div>
       )}
