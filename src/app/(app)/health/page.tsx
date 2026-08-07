@@ -1,7 +1,6 @@
 import { HeartPulse } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/server/services/user.service";
-import { settingsService } from "@/server/services/settings.service";
 import { HealthLogger } from "@/components/health/health-logger";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -20,16 +19,15 @@ export default async function HealthPage() {
   const start = new Date(); start.setHours(0, 0, 0, 0);
   const end = new Date(start); end.setDate(end.getDate() + 1);
 
-  const [settings, todayMetrics, recent] = user
+  const [todayMetrics, recent] = user
     ? await Promise.all([
-        settingsService.get(user.id),
         prisma.healthMetric.findMany({ where: { userId: user.id, date: { gte: start, lt: end } } }),
         prisma.healthMetric.findMany({ where: { userId: user.id }, orderBy: { date: "desc" }, take: 15 }),
       ])
-    : [null, [], []];
+    : [[], []];
 
   const waterMl = todayMetrics.filter((m) => m.kind === "water").reduce((s, m) => s + m.value, 0);
-  const waterGoal = settings?.waterGoalMl ?? 2500;
+  const waterGoal = user?.settings?.waterGoalMl ?? 2500;
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">

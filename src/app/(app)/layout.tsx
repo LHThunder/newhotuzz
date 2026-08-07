@@ -5,7 +5,6 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { QuickAdd } from "@/components/layout/quick-add";
 import { ensureUser } from "@/server/services/user.service";
-import { settingsService } from "@/server/services/settings.service";
 import { AccentProvider } from "@/components/settings/accent-provider";
 
 const supabaseConfigured =
@@ -18,7 +17,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (supabaseConfigured) {
     const user = await ensureUser();
     if (!user) redirect("/login");
-    accent = (await settingsService.get(user.id)).accentColor;
+    accent = user.settings?.accentColor ?? "violet";
   }
 
   return (

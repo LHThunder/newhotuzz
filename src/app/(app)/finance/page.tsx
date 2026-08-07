@@ -7,7 +7,6 @@ import { formatMoney, cn } from "@/lib/utils";
 import { localeFor, currencySymbol } from "@/lib/settings-config";
 import { ensureUser } from "@/server/services/user.service";
 import { financeService } from "@/server/services/finance.service";
-import { settingsService } from "@/server/services/settings.service";
 
 export const metadata = { title: "Finance — LIFE OS" };
 
@@ -16,17 +15,16 @@ const palette = ["#f59e0b", "#8b5cf6", "#38bdf8", "#f472b6", "#22c55e", "#94a3b8
 export default async function FinancePage() {
   const user = await ensureUser();
 
-  const [summary, txns, accounts, settings] = user
+  const [summary, txns, accounts] = user
     ? await Promise.all([
         financeService.summary(user.id),
         financeService.list(user.id, 30),
         financeService.accounts(user.id),
-        settingsService.get(user.id),
       ])
-    : [{ income: 0, expense: 0, netWorth: 0, savingsRate: 0, byCategory: [] as { category: string; amount: number }[] }, [], [], null];
+    : [{ income: 0, expense: 0, netWorth: 0, savingsRate: 0, byCategory: [] as { category: string; amount: number }[] }, [], []];
 
-  const currency = settings?.currency ?? "VND";
-  const locale = localeFor[settings?.language ?? "vi"] ?? "vi-VN";
+  const currency = user?.settings?.currency ?? "VND";
+  const locale = localeFor[user?.settings?.language ?? "vi"] ?? "vi-VN";
   const money = (n: number) => formatMoney(n, currency, locale);
 
   const byCategory = summary.byCategory.map((c, i) => ({ ...c, color: palette[i % palette.length] }));

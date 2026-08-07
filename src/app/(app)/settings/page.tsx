@@ -1,6 +1,5 @@
 import { SettingsForm } from "@/components/settings/settings-form";
 import { ensureUser } from "@/server/services/user.service";
-import { settingsService } from "@/server/services/settings.service";
 
 export const metadata = { title: "Settings — LIFE OS" };
 
@@ -12,7 +11,7 @@ const defaults = {
 
 export default async function SettingsPage() {
   const user = await ensureUser();
-  const settings = user ? await settingsService.get(user.id) : defaults;
+  const settings = user?.settings ?? defaults;
 
   return <SettingsForm initial={settings as typeof defaults} />;
 }
