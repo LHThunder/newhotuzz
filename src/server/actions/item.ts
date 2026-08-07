@@ -13,20 +13,22 @@ async function uid() {
 
 export async function updateBook(
   id: string,
-  data: { status?: string; rating?: number; currentPage?: number },
+  data: { status?: string; rating?: number; currentPage?: number; totalPages?: number; author?: string; review?: string },
 ): Promise<Result> {
   const userId = await uid();
   if (!userId) return { ok: false, error: "Chưa đăng nhập." };
   const owned = await prisma.book.findFirst({ where: { id, userId } });
   if (!owned) return { ok: false, error: "Không có quyền." };
-  await prisma.book.update({ where: { id }, data });
+  // Auto-complete when the reader reaches the last page.
+  const status = data.status ?? (data.currentPage != null && owned.totalPages && data.currentPage >= owned.totalPages ? "done" : undefined);
+  await prisma.book.update({ where: { id }, data: { ...data, ...(status ? { status } : {}) } });
   revalidatePath("/books");
   return { ok: true };
 }
 
 export async function updateMovie(
   id: string,
-  data: { status?: string; rating?: number },
+  data: { status?: string; rating?: number; kind?: string; review?: string },
 ): Promise<Result> {
   const userId = await uid();
   if (!userId) return { ok: false, error: "Chưa đăng nhập." };
@@ -34,6 +36,45 @@ export async function updateMovie(
   if (!owned) return { ok: false, error: "Không có quyền." };
   await prisma.movie.update({ where: { id }, data });
   revalidatePath("/movies");
+  return { ok: true };
+}
+
+export async function updateNote(
+  id: string,
+  data: { title?: string; content?: string; kind?: string },
+): Promise<Result> {
+  const userId = await uid();
+  if (!userId) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.note.findFirst({ where: { id, userId } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.note.update({ where: { id }, data });
+  revalidatePath("/brain");
+  return { ok: true };
+}
+
+export async function updateProject(
+  id: string,
+  data: { name?: string; emoji?: string; color?: string; status?: string },
+): Promise<Result> {
+  const userId = await uid();
+  if (!userId) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.project.findFirst({ where: { id, userId } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.project.update({ where: { id }, data });
+  revalidatePath("/projects");
+  return { ok: true };
+}
+
+export async function updateCourseDetail(
+  id: string,
+  data: { provider?: string; hoursSpent?: number },
+): Promise<Result> {
+  const userId = await uid();
+  if (!userId) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.course.findFirst({ where: { id, userId } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.course.update({ where: { id }, data });
+  revalidatePath("/learning");
   return { ok: true };
 }
 

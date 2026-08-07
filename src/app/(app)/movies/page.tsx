@@ -28,7 +28,7 @@ export default async function MoviesPage() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {movies.map((m) => (
-            <MovieItem key={m.id} movie={{ id: m.id, title: m.title, status: m.status, rating: m.rating }} />
+            <MovieItem key={m.id} movie={{ id: m.id, title: m.title, status: m.status, rating: m.rating, kind: m.kind, review: m.review }} />
           ))}
         </div>
       )}

@@ -28,7 +28,7 @@ export default async function LearningPage() {
       ) : (
         <div className="space-y-3">
           {courses.map((c) => (
-            <CourseItem key={c.id} course={{ id: c.id, title: c.title, provider: c.provider, progress: c.progress, status: c.status }} />
+            <CourseItem key={c.id} course={{ id: c.id, title: c.title, provider: c.provider, progress: c.progress, status: c.status, hoursSpent: Number(c.hoursSpent) }} />
           ))}
         </div>
       )}

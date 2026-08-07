@@ -2,10 +2,9 @@ import { FolderKanban } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/server/services/user.service";
 import { createProject } from "@/server/actions/tracker";
-import { Card, CardContent } from "@/components/ui/card";
 import { InlineAdd } from "@/components/ui/inline-add";
 import { EmptyState } from "@/components/ui/empty-state";
-import { DeleteButton } from "@/components/tracker/delete-button";
+import { ProjectItem } from "@/components/tracker/project-item";
 
 export const metadata = { title: "Projects — LIFE OS" };
 
@@ -33,18 +32,7 @@ export default async function ProjectsPage() {
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {projects.map((p) => (
-            <Card key={p.id}>
-              <CardContent className="flex items-center gap-3 pt-5">
-                <span className="grid size-10 place-items-center rounded-xl text-xl" style={{ background: `${p.color}22` }}>
-                  {p.emoji ?? "🚀"}
-                </span>
-                <div className="flex-1">
-                  <p className="font-medium">{p.name}</p>
-                  <p className="text-xs text-muted-foreground">{p._count.tasks} task · {p.status}</p>
-                </div>
-                <DeleteButton type="project" id={p.id} />
-              </CardContent>
-            </Card>
+            <ProjectItem key={p.id} project={{ id: p.id, name: p.name, emoji: p.emoji, color: p.color, status: p.status, taskCount: p._count.tasks }} />
           ))}
         </div>
       )}

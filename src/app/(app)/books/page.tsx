@@ -28,7 +28,7 @@ export default async function BooksPage() {
       ) : (
         <div className="space-y-2">
           {books.map((b) => (
-            <BookItem key={b.id} book={{ id: b.id, title: b.title, author: b.author, status: b.status, rating: b.rating }} />
+            <BookItem key={b.id} book={{ id: b.id, title: b.title, author: b.author, status: b.status, rating: b.rating, currentPage: b.currentPage, totalPages: b.totalPages, review: b.review }} />
           ))}
         </div>
       )}

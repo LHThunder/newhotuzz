@@ -2,6 +2,7 @@ import { HeartPulse } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/server/services/user.service";
 import { HealthLogger } from "@/components/health/health-logger";
+import { TrendChart } from "@/components/charts/trend-chart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { DeleteButton } from "@/components/tracker/delete-button";
@@ -19,15 +20,20 @@ export default async function HealthPage() {
   const start = new Date(); start.setHours(0, 0, 0, 0);
   const end = new Date(start); end.setDate(end.getDate() + 1);
 
-  const [todayMetrics, recent] = user
+  const [todayMetrics, recent, weightLogs] = user
     ? await Promise.all([
         prisma.healthMetric.findMany({ where: { userId: user.id, date: { gte: start, lt: end } } }),
         prisma.healthMetric.findMany({ where: { userId: user.id }, orderBy: { date: "desc" }, take: 15 }),
+        prisma.healthMetric.findMany({ where: { userId: user.id, kind: "weight" }, orderBy: { date: "asc" }, take: 30 }),
       ])
-    : [[], []];
+    : [[], [], []];
 
   const waterMl = todayMetrics.filter((m) => m.kind === "water").reduce((s, m) => s + m.value, 0);
   const waterGoal = user?.settings?.waterGoalMl ?? 2500;
+  const weightSeries = weightLogs.map((w) => ({
+    label: new Date(w.date).toLocaleDateString("vi-VN", { day: "numeric", month: "numeric" }),
+    value: w.value,
+  }));
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
@@ -37,6 +43,13 @@ export default async function HealthPage() {
       </div>
 
       <HealthLogger waterMl={waterMl} waterGoal={waterGoal} />
+
+      {weightSeries.length >= 2 && (
+        <Card>
+          <CardHeader><CardTitle>Xu hướng cân nặng</CardTitle></CardHeader>
+          <CardContent><TrendChart data={weightSeries} unit="kg" color="hsl(var(--accent-brain))" /></CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader><CardTitle>Lịch sử gần đây</CardTitle></CardHeader>
