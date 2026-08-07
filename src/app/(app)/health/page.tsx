@@ -1,13 +1,62 @@
 import { HeartPulse } from "lucide-react";
-import { ModulePlaceholder } from "@/components/layout/module-placeholder";
+import { prisma } from "@/lib/prisma";
+import { ensureUser } from "@/server/services/user.service";
+import { settingsService } from "@/server/services/settings.service";
+import { HealthLogger } from "@/components/health/health-logger";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { EmptyState } from "@/components/ui/empty-state";
 
-export default function Page() {
+export const metadata = { title: "Health — LIFE OS" };
+
+const kindLabel: Record<string, string> = {
+  water: "Nước", weight: "Cân nặng", steps: "Số bước", meditation: "Thiền", calories: "Calo", heart_rate: "Nhịp tim",
+};
+const kindUnit: Record<string, string> = { water: "ml", weight: "kg", steps: "", meditation: "phút", calories: "kcal", heart_rate: "bpm" };
+
+export default async function HealthPage() {
+  const user = await ensureUser();
+
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const end = new Date(start); end.setDate(end.getDate() + 1);
+
+  const [settings, todayMetrics, recent] = user
+    ? await Promise.all([
+        settingsService.get(user.id),
+        prisma.healthMetric.findMany({ where: { userId: user.id, date: { gte: start, lt: end } } }),
+        prisma.healthMetric.findMany({ where: { userId: user.id }, orderBy: { date: "desc" }, take: 15 }),
+      ])
+    : [null, [], []];
+
+  const waterMl = todayMetrics.filter((m) => m.kind === "water").reduce((s, m) => s + m.value, 0);
+  const waterGoal = settings?.waterGoalMl ?? 2500;
+
   return (
-    <ModulePlaceholder
-      icon={HeartPulse}
-      title="Health"
-      description="Theo dõi giấc ngủ, tập luyện, calo, cân nặng, nước, nhịp tim, thiền & số bước."
-      features={["Sleep", "Workout", "Calories", "Weight", "Water", "Heart Rate", "Steps"]}
-    />
+    <div className="mx-auto max-w-3xl space-y-5">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">Health</h1>
+        <p className="text-sm text-muted-foreground">Theo dõi sức khoẻ mỗi ngày.</p>
+      </div>
+
+      <HealthLogger waterMl={waterMl} waterGoal={waterGoal} />
+
+      <Card>
+        <CardHeader><CardTitle>Lịch sử gần đây</CardTitle></CardHeader>
+        <CardContent>
+          {recent.length === 0 ? (
+            <EmptyState icon={HeartPulse} title="Chưa có dữ liệu" description="Ghi lại chỉ số sức khoẻ đầu tiên ở trên." className="border-0 py-6" />
+          ) : (
+            <div className="space-y-1">
+              {recent.map((m) => (
+                <div key={m.id} className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent/30">
+                  <span className="flex-1">{kindLabel[m.kind] ?? m.kind}</span>
+                  <span className="font-medium tabular-nums">{m.value.toLocaleString("vi-VN")} {kindUnit[m.kind] ?? ""}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(m.date).toLocaleDateString("vi-VN", { day: "numeric", month: "numeric" })}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }

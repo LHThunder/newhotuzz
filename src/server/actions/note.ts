@@ -23,3 +23,9 @@ export async function createNote(input: unknown): Promise<ActionResult> {
   revalidatePath("/brain");
   return { ok: true, data: note };
 }
+
+/** Single-string create for the InlineAdd bar. */
+export async function createNoteQuick(title: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const res = await createNote({ title });
+  return res.ok ? { ok: true } : { ok: false, error: res.error };
+}
