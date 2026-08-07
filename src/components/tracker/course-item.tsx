@@ -11,9 +11,10 @@ import { DeleteButton } from "@/components/tracker/delete-button";
 import { updateCourse, updateCourseDetail } from "@/server/actions/item";
 import { cn } from "@/lib/utils";
 
-type Course = { id: string; title: string; provider: string | null; progress: number; status: string; hoursSpent: number };
+type Course = { id: string; title: string; kind: string; provider: string | null; progress: number; status: string; hoursSpent: number };
 
 const statusLabel: Record<string, string> = { learning: "Đang học", done: "Hoàn thành", wishlist: "Dự định" };
+const kindEmoji: Record<string, string> = { course: "🎓", video: "🎬", article: "📄", book: "📗", certificate: "🏅" };
 
 export function CourseItem({ course }: { course: Course }) {
   const router = useRouter();
@@ -32,6 +33,7 @@ export function CourseItem({ course }: { course: Course }) {
     <Card>
       <CardContent className="pt-4">
         <div className="flex items-center justify-between gap-2">
+          <span className="shrink-0 text-lg">{kindEmoji[course.kind] ?? "🎓"}</span>
           <p className="min-w-0 flex-1 truncate font-medium">{course.title}</p>
           <Badge variant="outline" className="text-[10px]">{statusLabel[course.status] ?? course.status}</Badge>
           <button onClick={() => setOpen(!open)} className="text-muted-foreground"><ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} /></button>

@@ -45,11 +45,18 @@ export async function createMovie(t: string): Promise<Result> {
 }
 
 export async function createCourse(t: string): Promise<Result> {
+  return createLearningItem(t, "course");
+}
+
+const learningKinds = ["course", "video", "article", "book", "certificate"];
+
+export async function createLearningItem(t: string, kind: string): Promise<Result> {
   const uid = await requireUser();
   if (!uid) return { ok: false, error: "Chưa đăng nhập." };
   const parsed = title.safeParse(t);
   if (!parsed.success) return { ok: false, error: parsed.error.errors[0].message };
-  await prisma.course.create({ data: { userId: uid, title: parsed.data, status: "learning" } });
+  const k = learningKinds.includes(kind) ? kind : "course";
+  await prisma.course.create({ data: { userId: uid, title: parsed.data, kind: k, status: "learning" } });
   revalidatePath("/learning");
   return { ok: true };
 }

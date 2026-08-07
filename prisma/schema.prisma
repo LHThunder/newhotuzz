@@ -471,6 +471,7 @@ model Course {
   userId     String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   title      String
+  kind       String   @default("course") // course | video | article | book | certificate
   provider   String?
   url        String?
   progress   Int      @default(0)
