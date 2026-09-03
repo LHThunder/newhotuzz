@@ -78,7 +78,7 @@ export default async function FinancePage() {
             </CardHeader>
             <CardContent><CashflowChart data={series} currency={currency} locale={locale} /></CardContent>
           </Card>
-          <BudgetManager budgets={budgets} money={money} />
+          <BudgetManager budgets={budgets} currency={currency} locale={locale} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">

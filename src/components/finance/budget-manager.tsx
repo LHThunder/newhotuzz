@@ -8,14 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { setBudget, deleteBudget } from "@/server/actions/finance";
-import { cn } from "@/lib/utils";
+import { cn, formatMoney } from "@/lib/utils";
 
 type Budget = { id: string; category: string; limit: number; spent: number };
 
 const categories = ["Ăn uống", "Nhà ở", "Di chuyển", "Giải trí", "Học tập", "Khác"];
 
-export function BudgetManager({ budgets, money }: { budgets: Budget[]; money: (n: number) => string }) {
+export function BudgetManager({ budgets, currency = "VND", locale = "vi-VN" }: { budgets: Budget[]; currency?: string; locale?: string }) {
   const router = useRouter();
+  const money = (n: number) => formatMoney(n, currency, locale);
   const [category, setCategory] = useState("Ăn uống");
   const [limit, setLimit] = useState("");
   const [busy, setBusy] = useState(false);
