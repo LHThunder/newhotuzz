@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ArrowUpRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { DeleteButton } from "@/components/tracker/delete-button";
@@ -42,7 +44,10 @@ export function ProjectItem({ project, progress }: { project: Project; progress:
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate font-medium">{project.name}</p>
+            <Link href={`/projects/${project.id}`} className="group/link flex items-center gap-1 truncate font-medium hover:text-primary">
+              {project.name}
+              <ArrowUpRight className="size-3.5 opacity-0 transition-opacity group-hover/link:opacity-100" />
+            </Link>
             <div className="mt-1 flex items-center gap-2">
               <button onClick={() => save({ status: next })} className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", statusStyle[project.status])}>
                 {statusLabel[project.status] ?? project.status}

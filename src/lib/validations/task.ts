@@ -15,6 +15,7 @@ export const createTaskSchema = z.object({
   priority: priorityEnum.default("NONE"),
   status: statusEnum.default("TODO"),
   dueDate: z.coerce.date().optional(),
+  startDate: z.coerce.date().optional(),
   estimateMin: z.number().int().positive().optional(),
   projectId: z.string().cuid().optional(),
   goalId: z.string().cuid().optional(),
