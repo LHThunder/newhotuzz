@@ -22,6 +22,9 @@ import {
   Dices,
   Users,
   Award,
+  Lightbulb,
+  UtensilsCrossed,
+  Sprout,
   type LucideIcon,
 } from "lucide-react";
 
@@ -67,6 +70,8 @@ export const navGroups: NavGroup[] = [
       { label: "Journal", href: "/journal", icon: BookOpen },
       { label: "Second Brain", href: "/brain", icon: Brain, accent: "--accent-brain" },
       { label: "Health", href: "/health", icon: HeartPulse, accent: "--accent-health" },
+      { label: "Ideas", href: "/ideas", icon: Lightbulb },
+      { label: "Personal Growth", href: "/personal-growth", icon: Sprout },
     ],
   },
   {
@@ -85,6 +90,7 @@ export const navGroups: NavGroup[] = [
       { label: "Board Games", href: "/board-games", icon: Dices },
       { label: "Contacts", href: "/contacts", icon: Users },
       { label: "Achievements", href: "/achievements", icon: Award },
+      { label: "Food & Recipes", href: "/food", icon: UtensilsCrossed },
     ],
   },
   {

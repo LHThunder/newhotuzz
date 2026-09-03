@@ -130,3 +130,69 @@ export async function deleteAchievement(achId: string): Promise<Result> {
   revalidatePath("/achievements");
   return { ok: true };
 }
+
+// ─── Ideas ────────────────────────────────────────────────
+export async function createIdea(title: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const p = nonEmpty.safeParse(title); if (!p.success) return { ok: false, error: "Trống." };
+  await prisma.idea.create({ data: { userId: id, title: p.data } });
+  revalidatePath("/ideas");
+  return { ok: true };
+}
+
+export async function updateIdea(ideaId: string, data: { status?: string; category?: string; notes?: string }): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.idea.findFirst({ where: { id: ideaId, userId: id } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.idea.update({ where: { id: ideaId }, data });
+  revalidatePath("/ideas");
+  return { ok: true };
+}
+
+export async function deleteIdea(ideaId: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.idea.findFirst({ where: { id: ideaId, userId: id } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.idea.delete({ where: { id: ideaId } });
+  revalidatePath("/ideas");
+  return { ok: true };
+}
+
+/** Convert an idea into a real project. */
+export async function ideaToProject(ideaId: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const idea = await prisma.idea.findFirst({ where: { id: ideaId, userId: id } });
+  if (!idea) return { ok: false, error: "Không có quyền." };
+  await prisma.project.create({ data: { userId: id, name: idea.title, description: idea.notes } });
+  await prisma.idea.update({ where: { id: ideaId }, data: { status: "done" } });
+  revalidatePath("/ideas");
+  revalidatePath("/projects");
+  return { ok: true };
+}
+
+// ─── Recipes ──────────────────────────────────────────────
+export async function createRecipe(name: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const p = nonEmpty.safeParse(name); if (!p.success) return { ok: false, error: "Trống." };
+  await prisma.recipe.create({ data: { userId: id, name: p.data } });
+  revalidatePath("/food");
+  return { ok: true };
+}
+
+export async function updateRecipe(recipeId: string, data: { category?: string; ingredients?: string; instructions?: string; rating?: number; favorite?: boolean; notes?: string }): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.recipe.findFirst({ where: { id: recipeId, userId: id } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.recipe.update({ where: { id: recipeId }, data });
+  revalidatePath("/food");
+  return { ok: true };
+}
+
+export async function deleteRecipe(recipeId: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.recipe.findFirst({ where: { id: recipeId, userId: id } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.recipe.delete({ where: { id: recipeId } });
+  revalidatePath("/food");
+  return { ok: true };
+}

@@ -55,6 +55,33 @@ model User {
   listItems    ListItem[]
   contacts     Contact[]
   boardGames   BoardGame[]
+  ideas        Idea[]
+  recipes      Recipe[]
+}
+
+model Idea {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  category  String?
+  status    String   @default("idea") // idea | exploring | done | dropped
+  notes     String?
+  createdAt DateTime @default(now())
+}
+
+model Recipe {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  category     String?
+  ingredients  String?
+  instructions String?
+  rating       Int?
+  favorite     Boolean  @default(false)
+  notes        String?
+  createdAt    DateTime @default(now())
 }
 
 model List {
