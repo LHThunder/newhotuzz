@@ -51,6 +51,64 @@ model User {
   achievements Achievement[]
   quests       Quest[]
   reviews      Review[]
+  lists        List[]
+  listItems    ListItem[]
+  contacts     Contact[]
+  boardGames   BoardGame[]
+}
+
+model List {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  emoji     String?    @default("📋")
+  items     ListItem[]
+  createdAt DateTime   @default(now())
+}
+
+model ListItem {
+  id        String   @id @default(cuid())
+  listId    String
+  list      List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  note      String?
+  done      Boolean  @default(false)
+  order     Float    @default(1000)
+  createdAt DateTime @default(now())
+
+  @@index([listId])
+}
+
+model Contact {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  relationship String?
+  company      String?
+  role         String?
+  contact      String?  // email / phone / handle
+  notes        String?
+  createdAt    DateTime @default(now())
+}
+
+model BoardGame {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  players     String?
+  playtime    String?
+  complexity  Int?     // 1..5
+  rating      Int?     // 1..5
+  timesPlayed Int      @default(0)
+  owned       Boolean  @default(true)
+  favorite    Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now())
 }
 
 model Review {

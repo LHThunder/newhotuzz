@@ -18,6 +18,10 @@ import {
   CalendarClock,
   ClipboardCheck,
   CalendarRange,
+  ListTodo,
+  Dices,
+  Users,
+  Award,
   type LucideIcon,
 } from "lucide-react";
 
@@ -72,6 +76,15 @@ export const navGroups: NavGroup[] = [
       { label: "Learning", href: "/learning", icon: GraduationCap, accent: "--accent-learning" },
       { label: "Books", href: "/books", icon: Library },
       { label: "Movies", href: "/movies", icon: Clapperboard },
+    ],
+  },
+  {
+    title: "Bộ sưu tập",
+    items: [
+      { label: "Lists", href: "/lists", icon: ListTodo },
+      { label: "Board Games", href: "/board-games", icon: Dices },
+      { label: "Contacts", href: "/contacts", icon: Users },
+      { label: "Achievements", href: "/achievements", icon: Award },
     ],
   },
   {
