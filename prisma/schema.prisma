@@ -50,6 +50,21 @@ model User {
   xpEvents     XpEvent[]
   achievements Achievement[]
   quests       Quest[]
+  reviews      Review[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // weekly_plan | weekly_review | monthly_review
+  periodKey String   // e.g. "2026-W32" (week) or "2026-08" (month)
+  data      Json     @default("{}") // plan text / reflection answers
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, type, periodKey])
+  @@index([userId, type])
 }
 
 model Settings {

@@ -15,6 +15,9 @@ import {
   Trophy,
   Sparkles,
   Settings,
+  CalendarClock,
+  ClipboardCheck,
+  CalendarRange,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,6 +38,14 @@ export const navGroups: NavGroup[] = [
       { label: "Mission Control", href: "/dashboard", icon: LayoutDashboard, shortcut: "G D" },
       { label: "AI Assistant", href: "/assistant", icon: Sparkles },
       { label: "Analytics", href: "/analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "Kế hoạch",
+    items: [
+      { label: "Weekly Planning", href: "/weekly-planning", icon: CalendarClock },
+      { label: "Weekly Review", href: "/weekly-review", icon: ClipboardCheck },
+      { label: "Monthly Review", href: "/monthly-review", icon: CalendarRange },
     ],
   },
   {
