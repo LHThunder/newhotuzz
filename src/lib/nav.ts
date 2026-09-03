@@ -32,7 +32,7 @@ export const navGroups: NavGroup[] = [
   {
     title: "Tổng quan",
     items: [
-      { label: "Mission Control", href: "/", icon: LayoutDashboard, shortcut: "G D" },
+      { label: "Mission Control", href: "/dashboard", icon: LayoutDashboard, shortcut: "G D" },
       { label: "AI Assistant", href: "/assistant", icon: Sparkles },
       { label: "Analytics", href: "/analytics", icon: BarChart3 },
     ],

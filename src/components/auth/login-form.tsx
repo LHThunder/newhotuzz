@@ -18,7 +18,7 @@ export function LoginForm() {
     setError(null);
     if (!isSupabaseConfigured) {
       // Scaffold mode: no backend — go straight to the dashboard.
-      window.location.href = mode === "signup" ? "/onboarding" : "/";
+      window.location.href = mode === "signup" ? "/onboarding" : "/dashboard";
       return;
     }
     setPending(true);
@@ -91,7 +91,7 @@ export function LoginForm() {
         </p>
       )}
       <p className="mt-2 text-center text-[11px]">
-        <Link href="/" className="text-muted-foreground hover:text-foreground">
+        <Link href="/dashboard" className="text-muted-foreground hover:text-foreground">
           Bỏ qua & xem dashboard →
         </Link>
       </p>

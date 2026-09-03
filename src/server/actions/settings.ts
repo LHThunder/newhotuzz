@@ -18,6 +18,6 @@ export async function updateSettings(input: unknown): Promise<ActionResult> {
 
   const data = await settingsService.update(user.id, parsed.data);
   revalidatePath("/settings");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data };
 }

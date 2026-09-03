@@ -21,7 +21,7 @@ export async function createHabit(input: unknown): Promise<ActionResult> {
 
   const habit = await habitService.create(user.id, parsed.data.name, parsed.data.emoji, parsed.data.color);
   revalidatePath("/habits");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: habit };
 }
 
@@ -38,7 +38,7 @@ export async function deleteHabit(id: string): Promise<ActionResult> {
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   await habitService.remove(user.id, id);
   revalidatePath("/habits");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: null };
 }
 
@@ -47,7 +47,7 @@ export async function toggleHabitToday(habitId: string): Promise<ActionResult> {
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   const res = await habitService.toggleToday(user.id, habitId);
   revalidatePath("/habits");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: res };
 }
 
@@ -56,6 +56,6 @@ export async function toggleHabitOnDate(habitId: string, dateKey: string): Promi
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   const res = await habitService.toggleOnDate(user.id, habitId, new Date(dateKey));
   revalidatePath("/habits");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: res };
 }

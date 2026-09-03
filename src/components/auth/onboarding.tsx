@@ -29,7 +29,7 @@ export function Onboarding() {
   const [picked, setPicked] = useState<string[]>(["goals", "habits"]);
   const [firstGoal, setFirstGoal] = useState("");
 
-  const next = () => (step < steps.length - 1 ? setStep(step + 1) : router.push("/"));
+  const next = () => (step < steps.length - 1 ? setStep(step + 1) : router.push("/dashboard"));
   const back = () => setStep(Math.max(0, step - 1));
   const toggle = (k: string) =>
     setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));

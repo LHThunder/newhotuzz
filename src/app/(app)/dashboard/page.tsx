@@ -4,6 +4,8 @@ import { ensureUser } from "@/server/services/user.service";
 import { taskService } from "@/server/services/task.service";
 import { habitService } from "@/server/services/habit.service";
 
+export const metadata = { title: "Mission Control — LIFE OS" };
+
 export default async function DashboardPage() {
   const user = await ensureUser();
 

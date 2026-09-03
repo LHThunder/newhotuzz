@@ -13,7 +13,7 @@ export async function signIn(_prev: unknown, formData: FormData): Promise<Action
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { ok: false, error: error.message };
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function signUp(_prev: unknown, formData: FormData): Promise<ActionResult> {

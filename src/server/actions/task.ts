@@ -25,7 +25,7 @@ export async function createTask(formData: unknown): Promise<ActionResult> {
 
   const task = await taskService.create(user.id, parsed.data);
   revalidatePath("/tasks");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: task };
 }
 
@@ -48,7 +48,7 @@ export async function toggleTaskDone(id: string): Promise<ActionResult> {
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   const task = await taskService.toggleDone(user.id, id);
   revalidatePath("/tasks");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: task };
 }
 
@@ -57,7 +57,7 @@ export async function deleteTask(id: string): Promise<ActionResult> {
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   await taskService.remove(user.id, id);
   revalidatePath("/tasks");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: null };
 }
 

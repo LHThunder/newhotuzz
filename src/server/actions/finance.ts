@@ -31,7 +31,7 @@ export async function quickAddTransaction(input: unknown): Promise<ActionResult>
   const acc = accountId ?? (await financeService.defaultAccount(user.id)).id;
   await financeService.create(user.id, { ...rest, accountId: acc, date: date ?? new Date() });
   revalidatePath("/finance");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: null };
 }
 
@@ -57,7 +57,7 @@ export async function deleteTransaction(id: string): Promise<ActionResult> {
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   await financeService.deleteTransaction(user.id, id);
   revalidatePath("/finance");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data: null };
 }
 
@@ -76,6 +76,6 @@ export async function createTransaction(input: unknown): Promise<ActionResult> {
 
   const data = await financeService.create(user.id, parsed.data);
   revalidatePath("/finance");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true, data };
 }

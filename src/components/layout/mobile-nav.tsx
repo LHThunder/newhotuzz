@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useUIStore } from "@/stores/ui-store";
 
 const items = [
-  { href: "/", icon: LayoutDashboard, label: "Home" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Home" },
   { href: "/tasks", icon: CheckSquare, label: "Tasks" },
   { href: "/habits", icon: Repeat, label: "Habits" },
   { href: "/analytics", icon: BarChart3, label: "Stats" },

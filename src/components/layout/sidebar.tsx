@@ -54,9 +54,7 @@ export function Sidebar() {
             <div className="space-y-0.5">
               {group.items.map((item) => {
                 const active =
-                  item.href === "/"
-                    ? pathname === "/"
-                    : pathname.startsWith(item.href);
+                  pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
                   <Link
                     key={item.href}

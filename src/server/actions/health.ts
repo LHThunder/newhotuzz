@@ -23,6 +23,6 @@ export async function logHealth(input: unknown): Promise<Result> {
     data: { userId: user.id, ...parsed.data, date: new Date() },
   });
   revalidatePath("/health");
-  revalidatePath("/");
+  revalidatePath("/dashboard");
   return { ok: true };
 }
