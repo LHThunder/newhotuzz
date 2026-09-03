@@ -40,7 +40,7 @@ function isToday(d: Date) {
   const t = new Date(); return d.toDateString() === t.toDateString();
 }
 
-export function TasksView({ tasks }: { tasks: Task[] }) {
+export function TasksView({ tasks, projects = [] }: { tasks: Task[]; projects?: { id: string; name: string }[] }) {
   const router = useRouter();
   const [view, setView] = useState("all");
   const [busy, setBusy] = useState<string | null>(null);
@@ -50,6 +50,7 @@ export function TasksView({ tasks }: { tasks: Task[] }) {
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState("NONE");
   const [due, setDue] = useState("");
+  const [projectId, setProjectId] = useState("");
   const [creating, setCreating] = useState(false);
 
   const refresh = () => router.refresh();
@@ -57,9 +58,9 @@ export function TasksView({ tasks }: { tasks: Task[] }) {
   async function create() {
     if (!title.trim()) return;
     setCreating(true);
-    await createTask({ title: title.trim(), priority, ...(due ? { dueDate: due } : {}) });
+    await createTask({ title: title.trim(), priority, ...(due ? { dueDate: due } : {}), ...(projectId ? { projectId } : {}) });
     setCreating(false);
-    setTitle(""); setPriority("NONE"); setDue("");
+    setTitle(""); setPriority("NONE"); setDue(""); setProjectId("");
     refresh();
   }
 
@@ -110,6 +111,13 @@ export function TasksView({ tasks }: { tasks: Task[] }) {
               <input type="date" value={due} onChange={(e) => setDue(e.target.value)}
                 className="h-8 rounded-lg border border-border bg-transparent pl-8 pr-2 text-xs outline-none focus:ring-2 focus:ring-ring" />
             </div>
+            {projects.length > 0 && (
+              <select value={projectId} onChange={(e) => setProjectId(e.target.value)}
+                className="h-8 rounded-lg border border-border bg-transparent px-2 text-xs outline-none focus:ring-2 focus:ring-ring">
+                <option value="" className="bg-background">Không dự án</option>
+                {projects.map((p) => <option key={p.id} value={p.id} className="bg-background">{p.name}</option>)}
+              </select>
+            )}
             <Button size="sm" className="ml-auto gap-1.5" onClick={create} disabled={!title.trim() || creating}>
               {creating ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />} Thêm
             </Button>

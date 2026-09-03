@@ -7,13 +7,14 @@ import { Check, Calendar, FolderKanban, ChevronDown, Trash2, X, Loader2 } from "
 import { Card, CardContent } from "@/components/ui/card";
 import { Ring } from "@/components/charts/ring";
 import { Badge } from "@/components/ui/badge";
-import { toggleMilestone, addMilestone, deleteMilestone, deleteGoal } from "@/server/actions/goal";
+import { toggleMilestone, addMilestone, deleteMilestone, deleteGoal, setGoalProject } from "@/server/actions/goal";
 import { cn } from "@/lib/utils";
 
 type Milestone = { id: string; title: string; done: boolean };
 type Goal = {
   id: string; title: string; horizon: string; progress: number;
   deadline: Date | string | null; project?: { name: string } | null; milestones: Milestone[];
+  fromProject?: boolean;
 };
 
 const horizonLabel: Record<string, string> = {
@@ -24,7 +25,11 @@ const horizonColor: Record<string, string> = {
   WEEK: "--accent-habit", DAY: "--accent-health", VISION: "--accent-brain", LIFE: "--accent-brain",
 };
 
-export function GoalCard({ goal, delay = 0 }: { goal: Goal; delay?: number }) {
+export function GoalCard({
+  goal, delay = 0, projects = [], projectId = null,
+}: {
+  goal: Goal; delay?: number; projects?: { id: string; name: string }[]; projectId?: string | null;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -68,6 +73,21 @@ export function GoalCard({ goal, delay = 0 }: { goal: Goal; delay?: number }) {
 
           {open && (
             <div className="mt-4 space-y-1 border-t border-border pt-3">
+              {projects.length > 0 && (
+                <div className="mb-3">
+                  <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                    Dự án liên kết {goal.fromProject && <span className="text-primary">· tiến độ tự tính từ task của dự án</span>}
+                  </label>
+                  <select
+                    value={projectId ?? ""}
+                    onChange={(e) => run("proj", () => setGoalProject(goal.id, e.target.value || null))}
+                    className="h-8 w-full rounded-lg border border-border bg-transparent px-2 text-xs outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="" className="bg-background">Không (dùng milestone)</option>
+                    {projects.map((p) => <option key={p.id} value={p.id} className="bg-background">{p.name}</option>)}
+                  </select>
+                </div>
+              )}
               <p className="mb-1.5 text-xs font-medium text-muted-foreground">Milestones · {done}/{goal.milestones.length}</p>
               {goal.milestones.map((m) => (
                 <div key={m.id} className="group flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 hover:bg-accent/20">

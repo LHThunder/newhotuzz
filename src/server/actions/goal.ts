@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
 import { getUser } from "@/lib/supabase/server";
 import { goalService } from "@/server/services/goal.service";
 import { createGoalSchema } from "@/lib/validations/goal";
@@ -52,6 +53,15 @@ export async function deleteGoal(id: string): Promise<ActionResult> {
   const user = await getUser();
   if (!user) return { ok: false, error: "Chưa đăng nhập." };
   await goalService.deleteGoal(user.id, id);
+  revalidatePath("/goals");
+  return { ok: true, data: null };
+}
+
+export async function setGoalProject(goalId: string, projectId: string | null): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) return { ok: false, error: "Chưa đăng nhập." };
+  await goalService.assertOwner(user.id, goalId);
+  await prisma.goal.update({ where: { id: goalId }, data: { projectId } });
   revalidatePath("/goals");
   return { ok: true, data: null };
 }
