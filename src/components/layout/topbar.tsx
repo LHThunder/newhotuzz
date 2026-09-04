@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { Moon, Sun, Bell, Search, Plus, Zap } from "lucide-react";
+import { Moon, Sun, Bell, Search, Plus, Zap, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useUIStore } from "@/stores/ui-store";
@@ -9,13 +9,17 @@ import { LiveClock } from "@/components/dashboard/live-clock";
 
 export function Topbar() {
   const { theme, setTheme } = useTheme();
-  const { setCommandOpen, setQuickAddOpen } = useUIStore();
+  const { setCommandOpen, setQuickAddOpen, setMobileMenuOpen } = useUIStore();
 
   return (
     <header className="glass sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 md:px-6">
-      <div className="md:hidden grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
-        <Zap className="size-4" />
-      </div>
+      <button
+        onClick={() => setMobileMenuOpen(true)}
+        aria-label="Mở menu"
+        className="md:hidden grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground"
+      >
+        <Menu className="size-4" />
+      </button>
 
       <button
         onClick={() => setCommandOpen(true)}

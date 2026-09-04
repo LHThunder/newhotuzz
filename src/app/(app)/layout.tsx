@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { MobileMenu } from "@/components/layout/mobile-menu";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { QuickAdd } from "@/components/layout/quick-add";
 import { ensureUser } from "@/server/services/user.service";
@@ -28,6 +29,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <main className="flex-1 px-4 pb-24 pt-5 md:px-6 md:pb-8">{children}</main>
       </div>
       <MobileNav />
+      <MobileMenu />
       <CommandPalette />
       <QuickAdd />
       <AccentProvider accent={accent} />
