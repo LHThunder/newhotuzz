@@ -14,21 +14,27 @@ const kindLabel: Record<string, string> = {
 };
 const kindUnit: Record<string, string> = { water: "ml", weight: "kg", steps: "", meditation: "phút", calories: "kcal", heart_rate: "bpm" };
 
-export default async function HealthPage() {
-  const user = await ensureUser();
+const isDateStr = (s?: string): s is string => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
 
-  const start = new Date(); start.setHours(0, 0, 0, 0);
+export default async function HealthPage({ searchParams }: { searchParams: Promise<{ date?: string }> }) {
+  const user = await ensureUser();
+  const dateParam = (await searchParams).date;
+
+  const now = new Date();
+  const selectedDate = isDateStr(dateParam) ? dateParam : `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+  const start = new Date(`${selectedDate}T00:00:00`);
   const end = new Date(start); end.setDate(end.getDate() + 1);
 
-  const [todayMetrics, recent, weightLogs] = user
+  const [dayMetrics, recent, weightLogs] = user
     ? await Promise.all([
-        prisma.healthMetric.findMany({ where: { userId: user.id, date: { gte: start, lt: end } } }),
+        prisma.healthMetric.findMany({ where: { userId: user.id, date: { gte: start, lt: end } }, orderBy: { date: "desc" } }),
         prisma.healthMetric.findMany({ where: { userId: user.id }, orderBy: { date: "desc" }, take: 15 }),
         prisma.healthMetric.findMany({ where: { userId: user.id, kind: "weight" }, orderBy: { date: "asc" }, take: 30 }),
       ])
     : [[], [], []];
 
-  const waterMl = todayMetrics.filter((m) => m.kind === "water").reduce((s, m) => s + m.value, 0);
+  const waterMl = dayMetrics.filter((m) => m.kind === "water").reduce((s, m) => s + m.value, 0);
   const waterGoal = user?.settings?.waterGoalMl ?? 2500;
   const weightSeries = weightLogs.map((w) => ({
     label: new Date(w.date).toLocaleDateString("vi-VN", { day: "numeric", month: "numeric" }),
@@ -39,10 +45,30 @@ export default async function HealthPage() {
     <div className="mx-auto max-w-3xl space-y-5">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Health</h1>
-        <p className="text-sm text-muted-foreground">Theo dõi sức khoẻ mỗi ngày.</p>
+        <p className="text-sm text-muted-foreground">Theo dõi sức khoẻ theo từng ngày — chọn ngày để xem & điền.</p>
       </div>
 
-      <HealthLogger waterMl={waterMl} waterGoal={waterGoal} />
+      <HealthLogger waterMl={waterMl} waterGoal={waterGoal} date={selectedDate} />
+
+      {/* Metrics logged on the selected day */}
+      <Card>
+        <CardHeader><CardTitle>Chỉ số ngày này</CardTitle></CardHeader>
+        <CardContent>
+          {dayMetrics.length === 0 ? (
+            <p className="py-4 text-center text-sm text-muted-foreground">Chưa có chỉ số nào cho ngày này.</p>
+          ) : (
+            <div className="space-y-1">
+              {dayMetrics.map((m) => (
+                <div key={m.id} className="group flex items-center gap-3 rounded-lg px-2 py-2 text-sm hover:bg-accent/30">
+                  <span className="flex-1">{kindLabel[m.kind] ?? m.kind}</span>
+                  <span className="font-medium tabular-nums">{m.value.toLocaleString("vi-VN")} {kindUnit[m.kind] ?? ""}</span>
+                  <DeleteButton type="health" id={m.id} className="opacity-0 group-hover:opacity-100" />
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {weightSeries.length >= 2 && (
         <Card>
