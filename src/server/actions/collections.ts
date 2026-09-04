@@ -196,3 +196,30 @@ export async function deleteRecipe(recipeId: string): Promise<Result> {
   revalidatePath("/food");
   return { ok: true };
 }
+
+// ─── Songs (sáng tác) ─────────────────────────────────────
+export async function createSong(title: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const p = nonEmpty.safeParse(title); if (!p.success) return { ok: false, error: "Trống." };
+  await prisma.song.create({ data: { userId: id, title: p.data } });
+  revalidatePath("/songs");
+  return { ok: true };
+}
+
+export async function updateSong(songId: string, data: { lyrics?: string; chords?: string; genre?: string; status?: string; audioUrl?: string; favorite?: boolean; notes?: string }): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.song.findFirst({ where: { id: songId, userId: id } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.song.update({ where: { id: songId }, data });
+  revalidatePath("/songs");
+  return { ok: true };
+}
+
+export async function deleteSong(songId: string): Promise<Result> {
+  const id = await uid(); if (!id) return { ok: false, error: "Chưa đăng nhập." };
+  const owned = await prisma.song.findFirst({ where: { id: songId, userId: id } });
+  if (!owned) return { ok: false, error: "Không có quyền." };
+  await prisma.song.delete({ where: { id: songId } });
+  revalidatePath("/songs");
+  return { ok: true };
+}

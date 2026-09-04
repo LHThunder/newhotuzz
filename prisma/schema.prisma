@@ -57,6 +57,23 @@ model User {
   boardGames   BoardGame[]
   ideas        Idea[]
   recipes      Recipe[]
+  songs        Song[]
+}
+
+model Song {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  lyrics    String?
+  chords    String?
+  genre     String?
+  status    String   @default("idea") // idea | draft | finished
+  audioUrl  String?  // link tới bản thu (SoundCloud, Drive…)
+  favorite  Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Idea {

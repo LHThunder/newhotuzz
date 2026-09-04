@@ -25,6 +25,7 @@ import {
   Lightbulb,
   UtensilsCrossed,
   Sprout,
+  Music4,
   type LucideIcon,
 } from "lucide-react";
 
@@ -71,6 +72,7 @@ export const navGroups: NavGroup[] = [
       { label: "Second Brain", href: "/brain", icon: Brain, accent: "--accent-brain" },
       { label: "Health", href: "/health", icon: HeartPulse, accent: "--accent-health" },
       { label: "Ideas", href: "/ideas", icon: Lightbulb },
+      { label: "Sáng tác", href: "/songs", icon: Music4 },
       { label: "Personal Growth", href: "/personal-growth", icon: Sprout },
     ],
   },
