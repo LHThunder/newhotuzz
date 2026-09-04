@@ -4,12 +4,22 @@
 
 export const profile = {
   name: "Tùng",
+  role: "Full-stack Developer · Product Builder", // dòng vai trò cho nhà tuyển dụng
   tagline: "Người xây dựng · Học mỗi ngày · Sống có kỷ luật",
   statement:
     "Mình xây sản phẩm, học không ngừng và vận hành cuộc sống như một hệ điều hành.",
   photo: "/avatar.svg", // đặt ảnh của bạn vào /public và đổi đường dẫn này
   location: "Lyon, Pháp",
   email: "tungtt903@gmail.com",
+  openToWork: true, // hiện huy hiệu "Sẵn sàng cho cơ hội mới" trên trang chủ
+
+  // Kỹ năng — chỉnh sửa tự do. Đây là stack thực tế bạn đang dùng để xây LIFE OS.
+  skills: [
+    { group: "Ngôn ngữ", items: ["TypeScript", "JavaScript", "SQL", "HTML/CSS"] },
+    { group: "Framework", items: ["Next.js", "React", "Node.js", "Tailwind CSS"] },
+    { group: "Dữ liệu & Hạ tầng", items: ["Prisma", "PostgreSQL", "Supabase", "Vercel"] },
+    { group: "Khác", items: ["AI / LLM", "System Design", "Zod", "Git"] },
+  ],
 
   about:
     "Xin chào! Mình là một người đam mê công nghệ, sản phẩm và phát triển bản thân. Trang này là 'mặt tiền' công khai của mình; bên trong là Personal OS — nơi mình quản lý mục tiêu, dự án, thói quen, tài chính và tri thức.",
