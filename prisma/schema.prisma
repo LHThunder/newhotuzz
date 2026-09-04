@@ -36,6 +36,8 @@ model User {
   notes        Note[]
   bookmarks    Bookmark[]
   credentials  Credential[]
+  docFolders   DocFolder[]
+  documents    Document[]
   accounts     Account[]
   transactions Transaction[]
   budgets      Budget[]
@@ -471,6 +473,33 @@ model Bookmark {
   note      String?
   favorite  Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+// Tài liệu & giấy tờ cá nhân — file lưu trên Supabase Storage (bucket riêng tư).
+model DocFolder {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String     // mục do người dùng tạo: CCCD, Hợp đồng, Bằng cấp…
+  color     String?
+  documents Document[]
+  createdAt DateTime   @default(now())
+}
+
+model Document {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folderId  String?
+  folder    DocFolder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  name      String     // tên hiển thị
+  path      String     // đường dẫn trong Storage: <userId>/<id>-<file>
+  mime      String     // image/png, application/pdf…
+  size      Int        // bytes
+  createdAt DateTime   @default(now())
+
+  @@index([userId])
+  @@index([folderId])
 }
 
 // Vault mật khẩu — `secret` được mã hoá AES-256-GCM trước khi lưu.

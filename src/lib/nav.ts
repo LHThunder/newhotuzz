@@ -28,6 +28,7 @@ import {
   Music4,
   KeyRound,
   Link2,
+  FolderArchive,
   type LucideIcon,
 } from "lucide-react";
 
@@ -95,6 +96,7 @@ export const navGroups: NavGroup[] = [
       { label: "Contacts", href: "/contacts", icon: Users },
       { label: "Achievements", href: "/achievements", icon: Award },
       { label: "Food & Recipes", href: "/food", icon: UtensilsCrossed },
+      { label: "Tài liệu & giấy tờ", href: "/documents", icon: FolderArchive },
       { label: "Mật khẩu", href: "/vault", icon: KeyRound },
       { label: "Link cần thiết", href: "/links", icon: Link2 },
     ],
