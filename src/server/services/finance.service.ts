@@ -49,6 +49,24 @@ export const financeService = {
     return prisma.account.findMany({ where: { userId }, orderBy: { createdAt: "asc" } });
   },
 
+  /** Income / expense / by-category for an arbitrary date range (for reports). */
+  async periodSummary(userId: string, start: Date, end: Date) {
+    const txns = await prisma.transaction.findMany({
+      where: { userId, date: { gte: start, lt: end } },
+      select: { type: true, amount: true, category: true },
+    });
+    const income = txns.filter((t) => t.type === "INCOME").reduce((s, t) => s + Number(t.amount), 0);
+    const expense = txns.filter((t) => t.type === "EXPENSE").reduce((s, t) => s + Number(t.amount), 0);
+    const cat: Record<string, number> = {};
+    for (const t of txns) if (t.type === "EXPENSE") cat[t.category] = (cat[t.category] ?? 0) + Number(t.amount);
+    const byCategory = Object.entries(cat).map(([category, amount]) => ({ category, amount })).sort((a, b) => b.amount - a.amount);
+    return {
+      income, expense, savings: income - expense,
+      savingsRate: income ? Math.round(((income - expense) / income) * 100) : 0,
+      byCategory,
+    };
+  },
+
   /** Returns the user's first account, creating a default "Ví" wallet if none. */
   async defaultAccount(userId: string) {
     const existing = await prisma.account.findFirst({ where: { userId } });
